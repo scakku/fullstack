@@ -1,6 +1,6 @@
 import React from "react";
 
-const Details = ({ person }) => {
+const Persons = ({ person }) => {
   return (
     <li>
       {person.name} {person.number}
@@ -8,4 +8,4 @@ const Details = ({ person }) => {
   );
 };
 
-export default Details;
+export default Persons;
