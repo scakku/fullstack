@@ -19,7 +19,10 @@ function App() {
   return (
     <>
       find countries <input onChange={(e) => setFilterSearch(e.target.value)} />
-      <CountrySearch filterCountry={filterCountry} />
+      <CountrySearch
+        filterCountry={filterCountry}
+        setFilterSearch={setFilterSearch}
+      />
     </>
   );
 }

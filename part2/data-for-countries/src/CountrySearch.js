@@ -1,7 +1,13 @@
-import React from "react";
+import { React, useState } from "react";
 
-const CountrySearch = ({ filterCountry }) => {
+const CountrySearch = ({ filterCountry, setFilterSearch }) => {
   // console.log(filterCountry.length);
+  const [display, setDisplay] = useState(false);
+  const buttonShow = (e) => {
+    setFilterSearch(e.target.value);
+  };
+  const countryShow = () => {};
+
   if (filterCountry.length >= 10) {
     return <p>Too many matches, specify another filter</p>;
   } else if (filterCountry.length === 1) {
@@ -9,21 +15,15 @@ const CountrySearch = ({ filterCountry }) => {
       <>
         {filterCountry.map((country, index) => (
           <div key={index}>
-            <div>
-              <h1>{country.name.common}</h1>
-            </div>
+            <h1>{country.name.common}</h1>
             <div>capital {country.capital}</div>
             <div>area {country.area}</div>
-            <br />
-            <div>
-              <h2>languages:</h2>
-            </div>
+            <h2>languages:</h2>
             <div>
               {Object.values(country.languages).map((lang) => (
                 <li key={lang + 1}>{lang}</li>
               ))}
             </div>
-            <br />
             <div>
               <img src={country.flags.png} alt="flag" />
             </div>
@@ -35,7 +35,12 @@ const CountrySearch = ({ filterCountry }) => {
     return (
       <>
         {filterCountry.map((country, index) => (
-          <li key={index}>{country.name.common}</li>
+          <li key={index}>
+            {country.name.common}
+            <button value={country.name.common} onClick={buttonShow}>
+              show
+            </button>
+          </li>
         ))}
       </>
     );
