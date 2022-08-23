@@ -1,12 +1,12 @@
-import { React, useState } from "react";
+import React from "react";
+import WeatherApi from "./WeatherApi";
 
 const CountrySearch = ({ filterCountry, setFilterSearch }) => {
   // console.log(filterCountry.length);
-  const [display, setDisplay] = useState(false);
+  // const [display, setDisplay] = useState(false);
   const buttonShow = (e) => {
     setFilterSearch(e.target.value);
   };
-  const countryShow = () => {};
 
   if (filterCountry.length >= 10) {
     return <p>Too many matches, specify another filter</p>;
@@ -27,6 +27,7 @@ const CountrySearch = ({ filterCountry, setFilterSearch }) => {
             <div>
               <img src={country.flags.png} alt="flag" />
             </div>
+            <WeatherApi capital={country.capital} />
           </div>
         ))}
       </>
@@ -47,7 +48,3 @@ const CountrySearch = ({ filterCountry, setFilterSearch }) => {
   }
 };
 export default CountrySearch;
-
-//     {country.languages.map((lang) => (
-// <li>{lang}</li>
-//  ))}

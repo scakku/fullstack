@@ -11,10 +11,12 @@ function App() {
       setCountries(response.data);
     });
   }, []);
+  //console.log("COUNTRIES", countries);
 
   const filterCountry = countries.filter((country) =>
     country.name.common.toLowerCase().includes(filterSearch.toLowerCase())
   );
+  // console.log("FILTERcountry", filterCountry);
 
   return (
     <>
