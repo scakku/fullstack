@@ -2,9 +2,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 const WeatherApi = ({ capital }) => {
-  const [weathers, setWeathers] = useState({});
+  const [weathers, setWeathers] = useState();
   const api_key = process.env.REACT_APP_API_KEY;
-  let pic;
 
   useEffect(() => {
     axios
@@ -16,22 +15,21 @@ const WeatherApi = ({ capital }) => {
       .then((response) => {
         setWeathers(response.data);
       });
-  }, []);
+  }, [api_key, capital]);
 
-  if (!weathers.weather) {
-    <p>Loading image</p>;
-  } else {
-    pic = weathers.weather[0].icon;
+  if (weathers) {
+    return (
+      <div>
+        <h2>Weather in {weathers.name}</h2>
+        <p>temperature {weathers.main.temp} Celsius</p>
+        <img
+          src={`http://openweathermap.org/img/wn/${weathers.weather[0].icon}.png`}
+          alt="weather"
+        />
+        <p>wind {weathers.wind.speed} m/s</p>
+      </div>
+    );
   }
-
-  return (
-    <div>
-      <h2>Weather in {weathers.name}</h2>
-      {weathers.main ? <p>temperature {weathers.main.temp} Celsius</p> : null}
-      <img src={`http://openweathermap.org/img/wn/${pic}.png`} alt="weather" />
-      {weathers.wind ? <p>wind {weathers.wind.speed} m/s</p> : null}
-    </div>
-  );
 };
 
 export default WeatherApi;

@@ -1,78 +1,123 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import personService from "./services/persons";
 import Persons from "./components/Persons";
-import PersonForm from "./components/PersonForm";
 import Filter from "./components/Filter";
+import PersonForm from "./components/PersonForm";
+import Notification from "./components/Notification";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
-  const [newNumber, setNumber] = useState("");
-  const [filterList, setFilter] = useState("");
+  const [newNumber, setNewNumber] = useState("");
+  const [filterList, setFilterList] = useState("");
+  const [render, setRender] = useState(false);
+  const [message, setMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      console.log("promse fulfilled");
-      setPersons(response.data);
+    personService.getAll().then((initialPersons) => {
+      setPersons(initialPersons);
+      setRender(false);
     });
-  }, []);
-  // console.log("render", persons.length, "persons");
+  }, [render]);
 
-  const addPerson = (e) => {
+  const addPerson = (e, id) => {
     e.preventDefault();
-    if (persons.find(nameExists)) {
-      alert(`${newName} "is already on phonebook"`);
+    const personObject = {
+      name: newName,
+      number: newNumber,
+      id: persons.length + 1,
+    };
+    const findPerson = persons.find(
+      (person) => person.name.toLowerCase() === newName.toLowerCase()
+    );
+
+    if (findPerson) {
+      const changedPerson = { ...findPerson, number: newNumber };
+      if (
+        window.confirm(
+          `${newName} is already added to phonebook, replace the old number with a new one`
+        )
+      ) {
+        personService
+          .update(findPerson.id, changedPerson)
+          .then((returnedPerson) => {
+            setPersons(
+              persons.map((person) =>
+                person.id !== id ? person : returnedPerson
+              )
+            );
+            setNewName("");
+            setNewNumber("");
+            setRender(true);
+            setMessage(`${newName} number have been changed`);
+            setTimeout(() => {
+              setMessage(null);
+            }, 3000);
+          })
+          .catch((error) => {
+            setErrorMessage(
+              `Information of ${newName} has already been removed from server`
+            );
+            setTimeout(() => {
+              setErrorMessage(null);
+            }, 3000);
+            setRender(true);
+          });
+      } else {
+        return;
+      }
     } else {
-      const personDetails = {
-        name: newName,
-        number: newNumber,
-        id: persons.length + 1,
-      };
-      setPersons(persons.concat(personDetails));
-      setNewName("");
-      setNumber("");
+      personService.create(personObject).then((returnedPerson) => {
+        setPersons(persons.concat(returnedPerson));
+        setNewName("");
+        setNewNumber("");
+        setMessage(`Added ${newName}`);
+        setTimeout(() => {
+          setMessage(null);
+        }, 2000);
+      });
     }
   };
 
-  const handlePersonChange = (event) => {
-    setNewName(event.target.value);
-  };
+  const personsToShow = filterList
+    ? persons.filter((person) =>
+        person.name.toLowerCase().startsWith(filterList.toLowerCase())
+      )
+    : persons;
 
-  const handleNumberChange = (event) => {
-    setNumber(event.target.value);
+  const handleDeleteButton = (id) => {
+    const findPerson = persons.find((n) => n.id === id);
+    if (window.confirm(`Delete ${findPerson.name}?`)) {
+      personService.deleteObject(findPerson.id).then(() => {
+        setPersons(persons.filter((person) => person.id !== id));
+      });
+    }
   };
-
-  const nameExists = (exists) => {
-    return exists.name.toLowerCase() === newName.toLowerCase();
-  };
-
-  const handleFilter = (e) => {
-    setFilter(e.target.value);
-  };
-
-  const filterName = persons.filter((person) =>
-    person.name.toLowerCase().startsWith(filterList.toLowerCase())
-  );
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <Filter handleFilter={handleFilter} />
-      <br />
-      <h3>add a new</h3>
+      <Notification message={message} errorMessage={errorMessage} />
+      <Filter filterList={filterList} setFilterList={setFilterList} />
+      <h2>add a new</h2>
       <PersonForm
         addPerson={addPerson}
         newName={newName}
         newNumber={newNumber}
-        handlePersonChange={handlePersonChange}
-        handleNumberChange={handleNumberChange}
+        setNewName={setNewName}
+        setNewNumber={setNewNumber}
       />
       <h2>Numbers</h2>
-      <>
-        {filterName.map((person) => (
-          <Persons person={person} key={person.id} number={person.number} />
+      <div>
+        {personsToShow.map((person) => (
+          <Persons
+            key={person.id}
+            person={person}
+            handleDeleteButton={handleDeleteButton}
+          />
         ))}
-      </>
+      </div>
     </div>
   );
 };

@@ -2,8 +2,6 @@ import React from "react";
 import WeatherApi from "./WeatherApi";
 
 const CountrySearch = ({ filterCountry, setFilterSearch }) => {
-  // console.log(filterCountry.length);
-  // const [display, setDisplay] = useState(false);
   const buttonShow = (e) => {
     setFilterSearch(e.target.value);
   };

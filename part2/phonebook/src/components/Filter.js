@@ -1,11 +1,19 @@
 import React from "react";
 
-const Filter = ({ handleFilter }) => {
+const Filter = ({ filterList, setFilterList }) => {
   return (
-    <>
-      filter shown with:
-      <input onChange={handleFilter} />
-    </>
+    <div>
+      <form>
+        <div>
+          filter shown with:{" "}
+          <input
+            value={filterList}
+            onChange={(e) => setFilterList(e.target.value)}
+          />
+        </div>
+      </form>
+    </div>
   );
 };
+
 export default Filter;
